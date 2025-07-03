@@ -3,14 +3,13 @@ import { useSessionStorage } from "@mantine/hooks";
 import styled from "styled-components";
 import { ViewMode } from "../../enums/viewMode.enum";
 import { GraphView } from "./views/GraphView";
-import { TreeView } from "./views/TreeView";
 
 const StyledLiveEditor = styled.div`
   position: relative;
   height: 100%;
   background: ${({ theme }) => theme.GRID_BG_COLOR};
   overflow: auto;
-  cursor: url("/assets/cursor.svg"), auto;
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJibGFjayIvPgo8L3N2Zz4K"), auto;
 
   & > ul {
     margin-top: 0 !important;
@@ -35,7 +34,6 @@ const View = () => {
   });
 
   if (viewMode === ViewMode.Graph) return <GraphView />;
-  if (viewMode === ViewMode.Tree) return <TreeView />;
   return null;
 };
 

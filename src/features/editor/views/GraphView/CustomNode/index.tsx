@@ -2,9 +2,7 @@ import React from "react";
 import { useComputedColorScheme } from "@mantine/core";
 import type { NodeProps } from "reaflow";
 import { Node } from "reaflow";
-import { useModal } from "../../../../../store/useModal";
 import type { NodeData } from "../../../../../types/graph";
-import useGraph from "../stores/useGraph";
 import { ObjectNode } from "./ObjectNode";
 import { TextNode } from "./TextNode";
 
@@ -22,23 +20,12 @@ const rootProps = {
 
 const CustomNodeWrapper = (nodeProps: NodeProps<NodeData["data"]>) => {
   const data = nodeProps.properties.data;
-  const setSelectedNode = useGraph(state => state.setSelectedNode);
-  const setVisible = useModal(state => state.setVisible);
   const colorScheme = useComputedColorScheme();
-
-  const handleNodeClick = React.useCallback(
-    (_: React.MouseEvent<SVGGElement, MouseEvent>, data: NodeData) => {
-      if (setSelectedNode) setSelectedNode(data);
-      setVisible("NodeModal", true);
-    },
-    [setSelectedNode, setVisible]
-  );
 
   return (
     <Node
       {...nodeProps}
       {...(data?.isEmpty && rootProps)}
-      onClick={handleNodeClick as any}
       animated={false}
       label={null as any}
       onEnter={ev => {

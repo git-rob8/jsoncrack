@@ -1,13 +1,10 @@
 import React from "react";
-import Link from "next/link";
 import { Flex, Popover, Text } from "@mantine/core";
 import styled from "styled-components";
-import { event as gaEvent } from "nextjs-google-analytics";
 import { BiSolidDockLeft } from "react-icons/bi";
 import {
   VscCheck,
   VscError,
-  VscFeedback,
   VscRunAll,
   VscSync,
   VscSyncIgnored,
@@ -80,7 +77,6 @@ const StyledBottomBarItem = styled.button<{ $bg?: string }>`
 `;
 
 export const BottomBar = () => {
-  const data = useFile(state => state.fileData);
   const toggleLiveTransform = useConfig(state => state.toggleLiveTransform);
   const liveTransformEnabled = useConfig(state => state.liveTransformEnabled);
   const error = useFile(state => state.error);
@@ -91,12 +87,7 @@ export const BottomBar = () => {
 
   const toggleEditor = () => {
     toggleFullscreen(!fullscreen);
-    gaEvent("toggle_fullscreen");
   };
-
-  React.useEffect(() => {
-    if (data?.name) window.document.title = `${data.name} | JSON Crack`;
-  }, [data]);
 
   return (
     <StyledBottomBar>
@@ -127,10 +118,7 @@ export const BottomBar = () => {
           )}
         </StyledBottomBarItem>
         <StyledBottomBarItem
-          onClick={() => {
-            toggleLiveTransform(!liveTransformEnabled);
-            gaEvent("toggle_live_transform");
-          }}
+          onClick={() => toggleLiveTransform(!liveTransformEnabled)}
         >
           {liveTransformEnabled ? <VscSync /> : <VscSyncIgnored />}
           <Text fz="xs">Live Transform</Text>
@@ -145,16 +133,6 @@ export const BottomBar = () => {
 
       <StyledRight>
         <StyledBottomBarItem>Nodes: {nodeCount}</StyledBottomBarItem>
-        <Link
-          href="https://github.com/AykutSarac/jsoncrack.com/discussions"
-          target="_blank"
-          rel="noopener"
-        >
-          <StyledBottomBarItem>
-            <VscFeedback />
-            Feedback
-          </StyledBottomBarItem>
-        </Link>
       </StyledRight>
     </StyledBottomBar>
   );

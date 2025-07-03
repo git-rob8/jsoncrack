@@ -7,20 +7,16 @@ import { Space } from "react-zoomable-ui";
 import { Canvas } from "reaflow";
 import type { ElkRoot } from "reaflow/dist/layout/useLayout";
 import { useLongPress } from "use-long-press";
-import useToggleHide from "../../../../hooks/useToggleHide";
 import useConfig from "../../../../store/useConfig";
 import { CustomEdge } from "./CustomEdge";
 import { CustomNode } from "./CustomNode";
-import { NotSupported } from "./NotSupported";
-import { OptionsMenu } from "./OptionsMenu";
-import { SecureInfo } from "./SecureInfo";
 import { ZoomControl } from "./ZoomControl";
 import useGraph from "./stores/useGraph";
 
-const StyledEditorWrapper = styled.div<{ $widget: boolean; $showRulers: boolean }>`
+const StyledEditorWrapper = styled.div<{ $showRulers: boolean }>`
   position: absolute;
   width: 100%;
-  height: ${({ $widget }) => ($widget ? "100vh" : "calc(100vh - 67px)")};
+  height: calc(100vh - 67px);
 
   --bg-color: ${({ theme }) => theme.GRID_BG_COLOR};
   --line-color-1: ${({ theme }) => theme.GRID_COLOR_PRIMARY};
@@ -47,7 +43,7 @@ const StyledEditorWrapper = styled.div<{ $widget: boolean; $showRulers: boolean 
   `};
 
   .jsoncrack-space {
-    cursor: url("/assets/cursor.svg"), auto;
+    cursor: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJibGFjayIvPgo8L3N2Zz4K"), auto;
   }
 
   :active {
@@ -73,12 +69,7 @@ const layoutOptions = {
   "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
 };
 
-interface GraphProps {
-  isWidget?: boolean;
-}
-
-const GraphCanvas = ({ isWidget }: GraphProps) => {
-  const { validateHiddenNodes } = useToggleHide();
+const GraphCanvas = () => {
   const setLoading = useGraph(state => state.setLoading);
   const centerView = useGraph(state => state.centerView);
   const direction = useGraph(state => state.direction);
@@ -98,15 +89,14 @@ const GraphCanvas = ({ isWidget }: GraphProps) => {
         setPaneHeight((layout.height as number) + 50);
 
         setTimeout(() => {
-          validateHiddenNodes();
           window.requestAnimationFrame(() => {
-            if (changeRatio > 70 || isWidget) centerView();
+            if (changeRatio > 70) centerView();
             setLoading(false);
           });
         });
       }
     },
-    [isWidget, paneHeight, paneWidth, centerView, setLoading, validateHiddenNodes]
+    [paneHeight, paneWidth, centerView, setLoading]
   );
 
   return (
@@ -136,10 +126,9 @@ const GraphCanvas = ({ isWidget }: GraphProps) => {
   );
 };
 
-export const GraphView = ({ isWidget = false }: GraphProps) => {
+export const GraphView = () => {
   const setViewPort = useGraph(state => state.setViewPort);
   const viewPort = useGraph(state => state.viewPort);
-  const aboveSupportedLimit = useGraph(state => state.aboveSupportedLimit);
   const loading = useGraph(state => state.loading);
   const gesturesEnabled = useConfig(state => state.gesturesEnabled);
   const rulersEnabled = useConfig(state => state.rulersEnabled);
@@ -168,13 +157,9 @@ export const GraphView = ({ isWidget = false }: GraphProps) => {
 
   return (
     <Box pos="relative" h="100%" w="100%">
-      {aboveSupportedLimit && <NotSupported />}
       <LoadingOverlay visible={debouncedLoading} />
-      {!isWidget && <OptionsMenu />}
-      {!isWidget && <SecureInfo />}
       <ZoomControl />
       <StyledEditorWrapper
-        $widget={isWidget}
         onContextMenu={e => e.preventDefault()}
         onClick={blurOnClick}
         key={String(gesturesEnabled)}
@@ -189,7 +174,7 @@ export const GraphView = ({ isWidget = false }: GraphProps) => {
           pollForElementResizing
           className="jsoncrack-space"
         >
-          <GraphCanvas isWidget={isWidget} />
+          <GraphCanvas />
         </Space>
       </StyledEditorWrapper>
     </Box>

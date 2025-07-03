@@ -1,15 +1,10 @@
 import React from "react";
-import Link from "next/link";
 import { Flex, Group, Select, Button } from "@mantine/core";
 import styled from "styled-components";
 import toast from "react-hot-toast";
 import { AiOutlineFullscreen } from "react-icons/ai";
-import { FaFireFlameCurved, FaGithub } from "react-icons/fa6";
 import { type FileFormat, formats } from "../../../enums/file.enum";
-import { JSONCrackLogo } from "../../../layout/JsonCrackLogo";
 import useFile from "../../../store/useFile";
-import { FileMenu } from "./FileMenu";
-import { ToolsMenu } from "./ToolsMenu";
 import { ViewMenu } from "./ViewMenu";
 import { StyledToolElement } from "./styles";
 
@@ -49,9 +44,9 @@ export const Toolbar = () => {
   return (
     <StyledTools>
       <Group gap="xs" justify="left" w="100%" style={{ flexWrap: "nowrap" }}>
-        <StyledToolElement title="JSON Crack">
+        <StyledToolElement title="JSON Editor">
           <Flex gap="xs" align="center" justify="center">
-            <JSONCrackLogo fontSize="0.8rem" hideLogo />
+            JSON Editor
           </Flex>
         </StyledToolElement>
         <Select
@@ -65,32 +60,9 @@ export const Toolbar = () => {
           allowDeselect={false}
         />
 
-        <FileMenu />
         <ViewMenu />
-        <ToolsMenu />
       </Group>
       <Group gap="xs" justify="right" w="100%" style={{ flexWrap: "nowrap" }}>
-        <Button
-          component={Link}
-          href="https://todiagram.com/editor?utm_source=jsoncrack&utm_medium=toolbar"
-          target="_blank"
-          rel="noopener"
-          autoContrast
-          color="green"
-          variant="outline"
-          c="bright"
-          size="compact-sm"
-          fz="12"
-          fw="600"
-          leftSection={<FaFireFlameCurved />}
-        >
-          NEW! JSON Crack v2.0
-        </Button>
-        <Link href="https://github.com/AykutSarac/jsoncrack.com" rel="noopener" target="_blank">
-          <StyledToolElement title="GitHub">
-            <FaGithub size="18" />
-          </StyledToolElement>
-        </Link>
         <StyledToolElement title="Fullscreen" onClick={fullscreenBrowser}>
           <AiOutlineFullscreen size="18" />
         </StyledToolElement>

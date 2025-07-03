@@ -18,17 +18,6 @@ const isPrimitiveOrNullType = (type: unknown): type is PrimitiveOrNullType => {
   return ["boolean", "string", "number", "null"].includes(type as string);
 };
 
-const alignChildren = (nodeA: Node, nodeB: Node): number => {
-  const aChildType = nodeA?.children?.[1]?.type;
-  const bChildType = nodeB?.children?.[1]?.type;
-
-  if (isPrimitiveOrNullType(aChildType) && !isPrimitiveOrNullType(bChildType)) {
-    return -1;
-  }
-
-  return 0;
-};
-
 function handleNoChildren(
   value: string | undefined,
   states: States,
@@ -70,8 +59,6 @@ function handleHasChildren(
   let parentId: string | undefined;
 
   if (type !== "property" && states.parentName !== "") {
-    // add last brothers node and add parent node
-
     if (states.brothersNode.length > 0) {
       const findBrothersNode = states.brothersNodeProps.find(
         e =>
@@ -114,12 +101,10 @@ function handleHasChildren(
       }
     }
 
-    // Add parent node
     parentId = addNodeToGraph({ graph, type, text: states.parentName });
     states.bracketOpen.push({ id: parentId, type });
     states.parentName = "";
 
-    // Add edges from parent node
     const brothersProps = states.brothersNodeProps.filter(
       e =>
         e.parentId === myParentId &&
@@ -140,6 +125,7 @@ function handleHasChildren(
   } else if (parentType === "array") {
     states.objectsFromArray = [...states.objectsFromArray, states.objectsFromArrayId++];
   }
+
   const traverseObject = (objectToTraverse: Node, nextType: string) => {
     traverse({
       states,
@@ -153,20 +139,17 @@ function handleHasChildren(
   const traverseArray = () => {
     children.forEach((objectToTraverse, index, array) => {
       const nextType = array[index + 1]?.type;
-
       traverseObject(objectToTraverse, nextType);
     });
   };
 
   if (type === "object") {
-    children.sort(alignChildren);
     traverseArray();
   } else {
     traverseArray();
   }
 
   if (type !== "property") {
-    // Add or concatenate brothers node when it is the last parent node
     if (states.brothersNode.length > 0) {
       const findBrothersNode = states.brothersNodeProps.find(
         e =>
@@ -210,7 +193,6 @@ function handleHasChildren(
       }
     }
 
-    // Close brackets
     if (parentType === "array") {
       if (states.objectsFromArray.length > 0) {
         states.objectsFromArray.pop();

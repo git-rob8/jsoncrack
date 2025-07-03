@@ -26,27 +26,9 @@ const TextEditor = () => {
   const contents = useFile(state => state.contents);
   const setContents = useFile(state => state.setContents);
   const setError = useFile(state => state.setError);
-  const jsonSchema = useFile(state => state.jsonSchema);
   const getHasChanges = useFile(state => state.getHasChanges);
   const theme = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
   const fileType = useFile(state => state.format);
-
-  React.useEffect(() => {
-    monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
-      validate: true,
-      allowComments: true,
-      enableSchemaRequest: true,
-      ...(jsonSchema && {
-        schemas: [
-          {
-            uri: "http://myserver/foo-schema.json",
-            fileMatch: ["*"],
-            schema: jsonSchema,
-          },
-        ],
-      }),
-    });
-  }, [jsonSchema, monaco?.languages.json.jsonDefaults]);
 
   React.useEffect(() => {
     const beforeunload = (e: BeforeUnloadEvent) => {
@@ -54,7 +36,7 @@ const TextEditor = () => {
         const confirmationMessage =
           "Unsaved changes, if you leave before saving  your changes will be lost";
 
-        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+        (e || window.event).returnValue = confirmationMessage;
         return confirmationMessage;
       }
     };

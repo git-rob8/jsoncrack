@@ -35,6 +35,7 @@ class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <ColorSchemeScript />
+          <title>JSON Editor</title>
         </Head>
         <body>
           <Main />

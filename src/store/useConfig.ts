@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import useGraph from "../features/editor/views/GraphView/stores/useGraph";
 
 const initialStates = {
   darkmodeEnabled: true,
@@ -32,10 +31,7 @@ const useConfig = create(
       toggleDarkMode: darkmodeEnabled => set({ darkmodeEnabled }),
       toggleCollapseButton: collapseButtonVisible => set({ collapseButtonVisible }),
       toggleChildrenCount: childrenCountVisible => set({ childrenCountVisible }),
-      toggleImagePreview: imagePreviewEnabled => {
-        set({ imagePreviewEnabled });
-        useGraph.getState().setGraph();
-      },
+      toggleImagePreview: imagePreviewEnabled => set({ imagePreviewEnabled }),
     }),
     {
       name: "config",

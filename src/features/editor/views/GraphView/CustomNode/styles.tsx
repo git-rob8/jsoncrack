@@ -1,6 +1,5 @@
 import type { DefaultTheme } from "styled-components";
 import styled from "styled-components";
-import { LinkItUrl } from "react-linkify-it";
 import { NODE_DIMENSIONS } from "../../../../../constants/graph";
 
 type TextColorFn = {
@@ -11,26 +10,18 @@ type TextColorFn = {
 };
 
 function getTextColor({ $value, $type, $parent, theme }: TextColorFn) {
-  // per type
   if ($parent && $type === "array") return theme.NODE_COLORS.PARENT_ARR;
   if ($parent && $type === "object") return theme.NODE_COLORS.PARENT_OBJ;
   if ($type === "object") return theme.NODE_COLORS.NODE_KEY;
   if ($type === "array") return theme.NODE_COLORS.NODE_VALUE;
 
-  // per value
   if ($value && !Number.isNaN(+$value)) return theme.NODE_COLORS.INTEGER;
   if ($value === "true") return theme.NODE_COLORS.BOOL.TRUE;
   if ($value === "false") return theme.NODE_COLORS.BOOL.FALSE;
   if ($value === "null") return theme.NODE_COLORS.NULL;
 
-  // default
   return theme.NODE_COLORS.NODE_VALUE;
 }
-
-export const StyledLinkItUrl = styled(LinkItUrl)`
-  text-decoration: underline;
-  pointer-events: all;
-`;
 
 export const StyledForeignObject = styled.foreignObject<{ $isObject?: boolean }>`
   text-align: ${({ $isObject }) => !$isObject && "center"};
@@ -40,39 +31,17 @@ export const StyledForeignObject = styled.foreignObject<{ $isObject?: boolean }>
   font-weight: 500;
   overflow: hidden;
   pointer-events: none;
-
-  &.searched {
-    background: rgba(27, 255, 0, 0.1);
-    border: 2px solid ${({ theme }) => theme.TEXT_POSITIVE};
-    border-radius: 2px;
-    box-sizing: border-box;
-  }
-
-  .highlight {
-    background: rgba(255, 214, 0, 0.15);
-  }
-
-  .renderVisible {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    cursor: pointer;
-  }
 `;
 
 export const StyledKey = styled.span<{ $parent?: boolean; $type: string; $value?: string }>`
   display: ${({ $parent }) => ($parent ? "flex" : "inline")};
   align-items: center;
-  justify-content: center; // Always center for parent nodes
+  justify-content: center;
   flex: 1;
   min-width: 0;
   height: ${({ $parent }) => ($parent ? `${NODE_DIMENSIONS.PARENT_HEIGHT}px` : "auto")};
   line-height: ${({ $parent }) => ($parent ? `${NODE_DIMENSIONS.PARENT_HEIGHT}px` : "inherit")};
-  padding: 0; // Remove padding
+  padding: 0;
   color: ${({ theme, $type, $parent = false, $value = "" }) =>
     getTextColor({ $parent, $type, $value, theme })};
   overflow: hidden;
@@ -95,14 +64,21 @@ export const StyledRow = styled.span<{ $value: string }>`
   &:last-of-type {
     border-bottom: none;
   }
-
-  .searched & {
-    border-bottom: 1px solid ${({ theme }) => theme.TEXT_POSITIVE};
-  }
 `;
 
 export const StyledChildrenCount = styled.span`
   color: ${({ theme }) => theme.NODE_COLORS.CHILD_COUNT};
   padding: 10px;
   margin-left: -15px;
+`;
+
+export const StyledTextNodeWrapper = styled.span<{ $hasCollapse: boolean; $isParent: boolean }>`
+  display: flex;
+  justify-content: ${({ $hasCollapse, $isParent }) =>
+    $hasCollapse ? "space-between" : $isParent ? "center" : "flex-start"};
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  padding: ${({ $hasCollapse }) => ($hasCollapse ? "0" : "0 10px")};
 `;

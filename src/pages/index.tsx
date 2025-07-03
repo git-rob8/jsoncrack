@@ -1,48 +1,89 @@
-import React from "react";
-import type { InferGetStaticPropsType, GetStaticProps } from "next";
-import { NextSeo } from "next-seo";
-import { SEO } from "../constants/seo";
-import { FAQ } from "../layout/Landing/FAQ";
-import { Features } from "../layout/Landing/Features";
-import { HeroPreview } from "../layout/Landing/HeroPreview";
-import { HeroSection } from "../layout/Landing/HeroSection";
-import { Section1 } from "../layout/Landing/Section1";
-import { Section2 } from "../layout/Landing/Section2";
-import { Section3 } from "../layout/Landing/Section3";
-import Layout from "../layout/PageLayout";
+import { useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useMantineColorScheme } from "@mantine/core";
+import styled, { ThemeProvider } from "styled-components";
+import { Allotment } from "allotment";
+import "allotment/dist/style.css";
+import { darkTheme, lightTheme } from "../constants/theme";
+import { BottomBar } from "../features/editor/BottomBar";
+import { Toolbar } from "../features/editor/Toolbar";
+import useGraph from "../features/editor/views/GraphView/stores/useGraph";
+import useConfig from "../store/useConfig";
+import useFile from "../store/useFile";
 
-export const HomePage = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
+const TextEditor = dynamic(() => import("../features/editor/TextEditor"), {
+  ssr: false,
+});
+
+const LiveEditor = dynamic(() => import("../features/editor/LiveEditor"), {
+  ssr: false,
+});
+
+export const StyledPageWrapper = styled.div`
+  height: calc(100vh - 27px);
+  width: 100%;
+
+  @media only screen and (max-width: 320px) {
+    height: 100vh;
+  }
+`;
+
+export const StyledEditorWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+`;
+
+export const StyledEditor = styled(Allotment)`
+  position: relative !important;
+  display: flex;
+  background: ${({ theme }) => theme.BACKGROUND_SECONDARY};
+  height: calc(100vh - 67px);
+
+  @media only screen and (max-width: 320px) {
+    height: 100vh;
+  }
+`;
+
+const EditorPage = () => {
+  const { setColorScheme } = useMantineColorScheme();
+  const checkEditorSession = useFile(state => state.checkEditorSession);
+  const darkmodeEnabled = useConfig(state => state.darkmodeEnabled);
+  const fullscreen = useGraph(state => state.fullscreen);
+
+  useEffect(() => {
+    checkEditorSession();
+  }, [checkEditorSession]);
+
+  useEffect(() => {
+    setColorScheme(darkmodeEnabled ? "dark" : "light");
+  }, [darkmodeEnabled, setColorScheme]);
+
   return (
-    <Layout>
-      <NextSeo {...SEO} canonical="https://jsoncrack.com" />
-      <HeroSection stars={props.stars} />
-      <HeroPreview />
-      <Section1 />
-      <Section2 />
-      <Section3 />
-      <Features />
-      <FAQ />
-    </Layout>
+    <ThemeProvider theme={darkmodeEnabled ? darkTheme : lightTheme}>
+      <StyledEditorWrapper>
+        <StyledPageWrapper>
+          <Toolbar />
+          <StyledEditorWrapper>
+            <StyledEditor proportionalLayout={false}>
+              <Allotment.Pane
+                preferredSize={450}
+                minSize={fullscreen ? 0 : 300}
+                maxSize={800}
+                visible={!fullscreen}
+              >
+                <TextEditor />
+              </Allotment.Pane>
+              <Allotment.Pane minSize={0}>
+                <LiveEditor />
+              </Allotment.Pane>
+            </StyledEditor>
+          </StyledEditorWrapper>
+        </StyledPageWrapper>
+        <BottomBar />
+      </StyledEditorWrapper>
+    </ThemeProvider>
   );
 };
 
-export default HomePage;
-
-export const getStaticProps = (async () => {
-  try {
-    const res = await fetch("https://api.github.com/repos/AykutSarac/jsoncrack.com");
-    const data = await res.json();
-
-    return {
-      props: {
-        stars: data?.stargazers_count || 0,
-      },
-    };
-  } catch (error) {
-    return {
-      props: {
-        stars: 0,
-      },
-    };
-  }
-}) satisfies GetStaticProps<{ stars: number }>;
+export default EditorPage;
